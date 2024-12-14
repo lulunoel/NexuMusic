@@ -8,6 +8,7 @@ from discord.ext import tasks
 from console_config import setup_console 
 import signal
 import asyncio
+from consolecommandmanager import ConsoleCommandManager
 
 logger = setup_console(__name__)
 load_dotenv()
@@ -46,6 +47,8 @@ async def load_extensions():
         await bot.load_extension("events.leave")
         await bot.load_extension("events.invitetracker")
         logger.info("Extensions events chargées avec succès.")
+        console_manager = ConsoleCommandManager(bot)
+        console_manager.start() 
     except Exception as e:
         logger.error(f"Impossible de charger les extensions : {e}")
                 
@@ -61,7 +64,6 @@ if __name__ == "__main__":
         loop = asyncio.get_running_loop()
         for sig in [signal.SIGTERM, signal.SIGINT]:
             loop.add_signal_handler(sig, lambda s=sig: asyncio.create_task(shutdown(s, loop)))
-
         try:
             await load_extensions()
             logger.info("Démarrage du bot Discord...")
