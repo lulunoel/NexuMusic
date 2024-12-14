@@ -45,29 +45,105 @@ class InviteManager(commands.Cog):
 
         self.invites_cache[member.guild.id] = current_invites
 
-        if used_invite:
-            self.db.cursor.execute(
-                """
-                INSERT INTO invite_uses (user_id, invite_code, guild_id)
-                VALUES (%s, %s, %s)
-                """,
-                (member.id, used_invite.code, member.guild.id)
-            )
-            self.db.connection.commit()
+        embed = discord.Embed(
+            title="🎉 Nouveau Membre",
+            color=discord.Color.green(),
+            timestamp=datetime.datetime.utcnow(),
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.add_field(name="Membre", value=member.mention, inline=False)
 
-            inviter = await member.guild.fetch_member(used_invite.inviter.id)
-            await member.guild.system_channel.send(
-                f"🎉 {member.mention} a été invité par {inviter.mention} en utilisant le code `{used_invite.code}`."
-            )
+        if used_invite:
+            query = """
+            SELECT COUNT(*) as count
+            FROM invite_uses
+            WHERE user_id = %s AND invite_code = %s AND guild_id = %s
+            """
+            self.db.cursor.execute(query, (member.id, used_invite.code, member.guild.id))
+            result = self.db.cursor.fetchone()
+
+            if result and result["count"] == 0:
+                self.db.cursor.execute(
+                    """
+                    INSERT INTO invite_uses (user_id, invite_code, guild_id)
+                    VALUES (%s, %s, %s)
+                    """,
+                    (member.id, used_invite.code, member.guild.id)
+                )
+                self.db.connection.commit()
+
+                inviter = await member.guild.fetch_member(used_invite.inviter.id)
+                embed.add_field(
+                    name="Invité par",
+                    value=f"{inviter.mention} (Code : `{used_invite.code}`)",
+                    inline=False,
+                )
+            else:
+                embed.add_field(
+                    name="Information",
+                    value="Le membre a réutilisé une invitation, aucun changement enregistré.",
+                    inline=False,
+                )
         else:
-            await member.guild.system_channel.send(
-                f"🎉 {member.mention} a rejoint le serveur, mais l'invitation utilisée n'a pas pu être déterminée."
+            embed.add_field(
+                name="Information",
+                value="Impossible de déterminer l'invitation utilisée.",
+                inline=False,
             )
+
+        await member.guild.system_channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_invite_delete(self, invite: discord.Invite):
         """Met à jour le cache lorsque des invitations sont supprimées."""
         self.invites_cache[invite.guild.id] = await invite.guild.invites()
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member: discord.Member):
+        """Gère le départ d'un membre."""
+        query = """
+        SELECT iu.invite_code, i.inviter_id 
+        FROM invite_uses iu
+        JOIN invites i ON iu.invite_code = i.invite_code
+        WHERE iu.user_id = %s AND iu.guild_id = %s
+        """
+        self.db.cursor.execute(query, (member.id, member.guild.id))
+        result = self.db.cursor.fetchone()
+
+        embed = discord.Embed(
+            title="👋 Départ d'un membre",
+            color=discord.Color.red(),
+            timestamp=datetime.datetime.utcnow()
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.add_field(name="Membre parti", value=f"{member.mention}", inline=False)
+
+        if result:
+            invite_code = result["invite_code"]
+            inviter_id = result["inviter_id"]
+            inviter = member.guild.get_member(inviter_id)
+
+            if inviter:
+                embed.add_field(
+                    name="Invité par",
+                    value=f"{inviter.mention} (Code: `{invite_code}`)",
+                    inline=False
+                )
+            else:
+                embed.add_field(
+                    name="Invité par",
+                    value=f"Utilisateur inconnu (Code: `{invite_code}`)",
+                    inline=False
+                )
+        else:
+            embed.add_field(
+                name="Invité par",
+                value="Impossible de déterminer l'invitation utilisée.",
+                inline=False
+            )
+
+        await member.guild.system_channel.send(embed=embed)
+
 
 async def setup(bot):
     db = Database(
