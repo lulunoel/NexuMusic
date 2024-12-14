@@ -29,6 +29,12 @@ class Server(commands.Cog):
         embed.add_field(name="Volume", value=settings["volume"])
         embed.add_field(name="Radio", value=settings["last_radio"])
         embed.set_footer(text=f"ID du serveur : {guild.id}")
+        embed.add_field(name="Niveau de boost", value=f"{guild.premium_tier}/3")
+        embed.add_field(name="Nombre de boost", value=guild.premium_subscription_count)
+        embed.add_field(name="Channel reglement", value=guild.rules_channel)
+        embed.add_field(name="Emoji", value=f"{len(guild.emojis)}/{guild.emoji_limit}")
+        embed.add_field(name="Stickers", value=f"{len(guild.stickers)}/{guild.sticker_limit}")
+
         await ctx.send(embed=embed)
 
 async def setup(bot):
