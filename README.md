@@ -146,6 +146,7 @@ Les contributions sont les bienvenues ! N'hésitez pas à proposer des améliora
 ## 📄 Licence
 
 Ce projet est sous licence [MIT](LICENSE).
+![Licence MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ## ✨ Remerciements
 
