@@ -1,10 +1,6 @@
 version: 2
 updates:
-  - package-ecosystem: "pip" # Gestionnaire de dépendances Python
-    directory: "/" # Localisation du fichier requirements.txt
-    schedule:
-      interval: "weekly" # Vérifie les mises à jour chaque semaine
-  - package-ecosystem: "github-actions" # Met à jour les workflows GitHub Actions
-    directory: "/" # Localisation des fichiers de workflow GitHub Actions
+  - package-ecosystem: "pip"
+    directory: "/"
     schedule:
       interval: "weekly"
