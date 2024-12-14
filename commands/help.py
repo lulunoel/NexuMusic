@@ -8,7 +8,7 @@ class HelpView(View):
         self.help_command = help_command
         self.context = context
         self.mapping = mapping
-        exclude_cogs = ['ErrorHandler', 'LoggerHandler', 'ReadyHandler', 'JoinHandler', 'LeaveHandler', 'InviteTracker']
+        exclude_cogs = ['ErrorHandler', 'LoggerHandler', 'ReadyHandler', 'JoinHandler', 'LeaveHandler', 'InviteManager', 'ConsoleCommandManager']
         for cog in mapping.keys():
             if cog and cog.qualified_name not in exclude_cogs:
                 self.add_item(HelpButton(label=cog.qualified_name, help_command=help_command, context=context, mapping=mapping, cog=cog))

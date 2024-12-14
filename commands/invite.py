@@ -22,25 +22,38 @@ class Invite(commands.Cog):
     async def show_invitations(self, ctx):
         """Affiche les invitations actives dans le serveur."""
         invites = await ctx.guild.invites()
+
         embed = discord.Embed(
             title="📨 Invitations Actives",
-            description=f"Liste des invitations actives pour le serveur {ctx.guild.name}.",
+            description=f"Voici la liste des invitations actives pour le serveur **{ctx.guild.name}**.",
             color=discord.Color.blue(),
             timestamp=datetime.datetime.utcnow(),
         )
 
         if not invites:
-            embed.description = "Aucune invitation active pour ce serveur."
+            embed.description = "🔍 **Aucune invitation active n'a été trouvée sur ce serveur.**"
         else:
             for invite in invites:
                 inviter = invite.inviter.mention if invite.inviter else "Inconnu"
+                expiration = (
+                    "Jamais"
+                    if invite.max_age == 0
+                    else f"<t:{int(invite.created_at.timestamp() + invite.max_age)}:R>"
+                )
                 embed.add_field(
-                    name=f"Code : `{invite.code}`",
-                    value=f"👤 **Inviteur** : {inviter}\n🔄 **Utilisations** : {invite.uses}",
+                    name=f"🔑 Code : `{invite.code}`",
+                    value=(
+                        f"👤 **Inviteur** : {inviter}\n"
+                        f"🔄 **Utilisations** : {invite.uses}\n"
+                        f"⏳ **Expire** : {expiration}"
+                    ),
                     inline=False,
                 )
 
-        embed.set_footer(text="Commandé par " + str(ctx.author), icon_url=ctx.author.avatar.url)
+        embed.set_footer(
+            text=f"Commandé par {ctx.author.display_name}",
+            icon_url=ctx.author.display_avatar.url,
+        )
         await ctx.send(embed=embed)
 
     @commands.command(name="who_invited", help="Montre qui a invité un utilisateur.")
@@ -60,33 +73,39 @@ class Invite(commands.Cog):
             self.db.cursor.execute(query, (user_id, guild_id))
             result = self.db.cursor.fetchone()
 
+            embed = discord.Embed(
+                title="🔍 Détails d'Invitation",
+                color=discord.Color.green(),
+                timestamp=datetime.datetime.utcnow(),
+            )
+            embed.set_thumbnail(url=member.display_avatar.url)
+            embed.add_field(name="Membre invité", value=member.mention, inline=False)
+
             if result:
                 inviter_id = result["inviter_id"]
                 invite_count = result["invite_count"]
-
                 inviter = ctx.guild.get_member(inviter_id)
-                embed = discord.Embed(
-                    title="👤 Invitation Info",
-                    color=discord.Color.green(),
-                    timestamp=datetime.datetime.utcnow(),
-                )
 
                 if inviter:
-                    embed.description = (
-                        f"{member.mention} a été invité par **{inviter.mention}**.\n"
-                        f"**{inviter.mention}** a actuellement invité **{invite_count}** personne(s)."
+                    embed.add_field(
+                        name="Invité par",
+                        value=f"{inviter.mention} (a invité **{invite_count}** personne(s))",
+                        inline=False,
                     )
                 else:
-                    embed.description = (
-                        f"{member.mention} a été invité par un utilisateur qui n'est plus sur ce serveur.\n"
-                        f"Cet utilisateur a invité **{invite_count}** personne(s)."
+                    embed.add_field(
+                        name="Invité par",
+                        value=f"Un utilisateur qui n'est plus sur le serveur.\n**Personnes invitées** : {invite_count}",
+                        inline=False,
                     )
-                await ctx.send(embed=embed)
             else:
-                await ctx.send(embed=discord.Embed(
-                    description=f":x: Impossible de trouver qui a invité {member.mention}.",
-                    color=discord.Color.red(),
-                ))
+                embed.add_field(
+                    name="Erreur",
+                    value=f":x: Impossible de déterminer qui a invité {member.mention}.",
+                    inline=False,
+                )
+
+            await ctx.send(embed=embed)
         except Exception as e:
             print(f"[ERREUR] who_invited: {e}")
             await ctx.send(embed=discord.Embed(
@@ -94,12 +113,14 @@ class Invite(commands.Cog):
                 color=discord.Color.red(),
             ))
 
+
     @commands.command(name="invite_count", help="Montre combien de personnes un utilisateur a invité.")
     async def invite_count(self, ctx, member: discord.Member):
         guild_id = ctx.guild.id
         inviter_id = member.id
 
         try:
+            # Requête pour compter les utilisateurs invités par cette personne
             query = """
             SELECT COUNT(iu.user_id) AS invite_count
             FROM invite_uses iu
@@ -109,24 +130,29 @@ class Invite(commands.Cog):
             self.db.cursor.execute(query, (inviter_id, guild_id))
             result = self.db.cursor.fetchone()
 
+            invite_count = result["invite_count"] if result and result["invite_count"] > 0 else 0
+
             embed = discord.Embed(
                 title="📊 Invitations Compte",
-                color=discord.Color.blue(),
-                timestamp=datetime.datetime.utcnow(),
+                color=discord.Color.green(),
+                timestamp=datetime.datetime.utcnow()
+            )
+            embed.set_thumbnail(url=member.display_avatar.url)
+            embed.add_field(
+                name="Utilisateur",
+                value=f"{member.mention}",
+                inline=False
+            )
+            embed.add_field(
+                name="Invitations",
+                value=f"{invite_count} personne(s) invitée(s)",
+                inline=False
             )
 
-            if result and result["invite_count"] > 0:
-                invite_count = result["invite_count"]
-                embed.description = f"👤 {member.mention} a invité **{invite_count}** personne(s) sur ce serveur."
-            else:
-                embed.description = f"👤 {member.mention} n'a invité personne sur ce serveur."
             await ctx.send(embed=embed)
         except Exception as e:
             print(f"[ERREUR] invite_count: {e}")
-            await ctx.send(embed=discord.Embed(
-                description=":x: Une erreur s'est produite lors de l'exécution de la commande.",
-                color=discord.Color.red(),
-            ))
+            await ctx.send(":x: Une erreur s'est produite lors de l'exécution de la commande.")
 
 
 async def setup(bot):
