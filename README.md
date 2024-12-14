@@ -4,6 +4,15 @@
 
 NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctionnalités musicales, de gestion d'invitations et bien plus encore. Ce bot est développé en Python et utilise des bibliothèques telles que `discord.py`.
 
+## Technologies Utilisées
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+  <img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord">
+  <img src="https://img.shields.io/badge/MIT_License-blue?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="MIT License">
+</p>
+
 ## 🚀 Fonctionnalités
 
 - **🎶 Commandes musicales :**
@@ -146,7 +155,6 @@ Les contributions sont les bienvenues ! N'hésitez pas à proposer des améliora
 ## 📄 Licence
 
 Ce projet est sous licence [MIT](LICENSE).
-![Licence MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ## ✨ Remerciements
 
