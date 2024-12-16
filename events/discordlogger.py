@@ -13,11 +13,24 @@ class DiscordLoggerHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        logger.info(f'Message supprimé par {message.author}: {message.content}')
+        if message.guild is None:
+            return
+        async for entry in message.guild.audit_logs(limit=1, action=discord.AuditLogAction.message_delete):
+            if entry.target.id == message.author.id:
+                logger.info(f"Message de {message.author} supprimé par {entry.user}: {message.content}")
+                break
+        else:
+            logger.info(f"Message de {message.author} supprimé: {message.content}")
 
     @commands.Cog.listener()
     async def on_bulk_message_delete(self, messages):
-        logger.info(f'Masse suppression: {len(messages)}')
+        if messages[0].guild is None:  
+            return
+        async for entry in messages[0].guild.audit_logs(limit=1, action=discord.AuditLogAction.message_bulk_delete):
+            logger.info(f"Masse suppression: {len(messages)} messages par {entry.user}")
+            break
+        else:
+            logger.info(f'Masse suppression: {len(messages)} messages')
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
