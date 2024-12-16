@@ -3,9 +3,12 @@ import colorlog
 
 def setup_console(name):
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)  # Capture all levels of logs
+    logger.setLevel(logging.DEBUG)
+    logging.getLogger('discord.client').setLevel(logging.WARNING)
+    logging.getLogger('discord.gateway').setLevel(logging.ERROR)
+    logging.getLogger('discord.http').setLevel(logging.ERROR)
+    logging.getLogger('discord.state').setLevel(logging.ERROR) 
 
-    # Create colorlog StreamHandler
     console_handler = colorlog.StreamHandler()
     console_handler.setFormatter(colorlog.ColoredFormatter(
         '%(log_color)s[%(asctime)s] (%(name)s) %(message)s',
