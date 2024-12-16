@@ -46,6 +46,7 @@ async def load_extensions():
         await bot.load_extension("events.join")
         await bot.load_extension("events.leave")
         await bot.load_extension("events.invitetracker")
+        await bot.load_extension("events.discordlogger")
         logger.info("Extensions events chargées avec succès.")
         console_manager = ConsoleCommandManager(bot)
         console_manager.start() 
