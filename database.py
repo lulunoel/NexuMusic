@@ -1,4 +1,7 @@
 import pymysql
+import logging
+
+logger = logging.getLogger('database')
 
 class Database:
     def __init__(self, host, user, password, database, port):
@@ -24,12 +27,30 @@ class Database:
             last_radio VARCHAR(255) DEFAULT NULL,
             server_log_id BIGINT UNIQUE NULL,
             server_welcome_id BIGINT UNIQUE NULL,
-            server_count_id BIGINT UNIQUE NULL
+            server_count_id BIGINT UNIQUE NULL,
+            server_suggestion_id BIGINT UNIQUE NULL
         )
         """
         self.cursor.execute(create_table_query)
         self.connection.commit()
         
+    def setup_reactions_database(self):
+        create_table_query = """
+        CREATE TABLE IF NOT EXISTS message_reactions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            message_id BIGINT NOT NULL,
+            user_id BIGINT NOT NULL,
+            reaction_type VARCHAR(10) NOT NULL,
+            reacted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP NULL,
+            channel_id BIGINT NOT NULL,
+            is_active BIGINT NOT NULL DEFAULT 1,
+            UNIQUE (message_id, user_id)
+        )
+        """
+        self.cursor.execute(create_table_query)
+        self.connection.commit()
+
     def setup_invites_database(self):
         """Crée les tables nécessaires pour la gestion des invitations."""
         create_invites_table = """
@@ -124,3 +145,58 @@ class Database:
         """Ferme la connexion à la base de données."""
         self.cursor.close()
         self.connection.close()
+        
+    def add_reaction(self, message_id, channel_id, user_id, reaction_type):
+        query = """
+        INSERT INTO message_reactions (message_id, channel_id, user_id, reaction_type, expires_at, is_active)
+        VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP + INTERVAL 4 HOUR, %s)
+        """
+        is_active = 1
+        self.cursor.execute(query, (message_id, channel_id, user_id, reaction_type, is_active))
+        self.connection.commit()
+
+    def user_already_reacted(self, message_id, user_id):
+        query = """
+        SELECT id FROM message_reactions 
+        WHERE message_id = %s AND user_id = %s AND expires_at > CURRENT_TIMESTAMP
+        """
+        self.cursor.execute(query, (message_id, user_id))
+        return self.cursor.fetchone() is not None
+
+    def get_expired_reactions(self):
+        query = """
+        SELECT message_id, channel_id FROM message_reactions
+        WHERE expires_at <= CURRENT_TIMESTAMP AND is_active = 1
+        """
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+    def deactivate_reaction(self, message_id):
+        update_query = """
+        UPDATE message_reactions SET is_active = 0 WHERE message_id = %s
+        """
+        self.cursor.execute(update_query, (message_id,))
+        self.connection.commit()
+
+    def get_reaction_counts(self, message_id):
+        query = """
+        SELECT reaction_type, COUNT(*) AS count
+        FROM message_reactions
+        WHERE message_id = %s AND is_active = 1
+        GROUP BY reaction_type
+        """
+        self.cursor.execute(query, (message_id,))
+        results = self.cursor.fetchall()
+        return {result['reaction_type']: result['count'] for result in results}
+    
+    def count_reactions(self, message_id):
+        query = """
+        SELECT reaction_type, COUNT(*) as count
+        FROM message_reactions
+        WHERE message_id = %s AND expires_at > CURRENT_TIMESTAMP
+        GROUP BY reaction_type
+        """
+        self.cursor.execute(query, (message_id,))
+        results = self.cursor.fetchall()
+        return {row['reaction_type']: row['count'] for row in results}
+

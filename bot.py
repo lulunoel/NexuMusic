@@ -10,7 +10,7 @@ import signal
 import asyncio
 from consolecommandmanager import ConsoleCommandManager
 
-logger = setup_console(__name__)
+logger = setup_console('Bot')
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 db = Database(
@@ -34,9 +34,8 @@ async def load_extensions(bot):
         db.setup_database()
         db.setup_radio_database()
         db.setup_invites_database()
+        db.setup_reactions_database()
         logger.info("La base de données est configurée.")
-
-        # Liste des fichiers à exclure du chargement
         exclude_files = ['__init__.py', 'help.py']
 
         extensions_path = ['commands', 'events']
