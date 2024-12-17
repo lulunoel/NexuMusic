@@ -33,7 +33,7 @@ class LoggerHandler(commands.Cog):
         if command:
             logger.info(f"Une commande: {command} a été exécutée par: {user} (ID: {user.id}) sur le serveur: {server} (ID: {server.id})")
             log_channel_id = settings['server_log_id']
-            log_channel = discord.utils.get(server.channels, id=int(log_channel_id))
+            log_channel = discord.utils.get(server.channels, id=log_channel_id)
             
             if log_channel:
                 embed = discord.Embed(title="Commande utilisée", color=discord.Color.red(), timestamp=datetime.datetime.now())

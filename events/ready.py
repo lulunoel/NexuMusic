@@ -7,7 +7,7 @@ from database import Database
 from radios import RADIOS
 import json
 from console_config import setup_console  
-logger = setup_console(__name__)
+logger = setup_console('ready')
 db = Database(
     host=os.getenv("HOST"),
     user=os.getenv("UTILISATEUR"),
