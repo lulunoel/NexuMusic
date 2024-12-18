@@ -146,30 +146,17 @@ class Database:
         self.cursor.close()
         self.connection.close()
         
-    def add_reaction(self, message_id, channel_id, user_id, reaction_type):
-        query = """
-        INSERT INTO message_reactions (message_id, channel_id, user_id, reaction_type, expires_at, is_active)
-        VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP + INTERVAL 4 HOUR, %s)
-        """
-        is_active = 1
-        self.cursor.execute(query, (message_id, channel_id, user_id, reaction_type, is_active))
+    def add_reaction(self, message_id, channel_id, user_id, reaction_type, is_active=True):
+        query_check = "SELECT * FROM message_reactions WHERE message_id = %s AND user_id = %s"
+        self.cursor.execute(query_check, (message_id, user_id))
+        result = self.cursor.fetchone()
+        if result:
+            query_update = "UPDATE message_reactions SET reaction_type = %s, is_active = %s WHERE message_id = %s AND user_id = %s"
+            self.cursor.execute(query_update, (reaction_type, is_active, message_id, user_id))
+        else:
+            query_insert = "INSERT INTO message_reactions (message_id, channel_id, user_id, reaction_type, is_active) VALUES (%s, %s, %s, %s, %s)"
+            self.cursor.execute(query_insert, (message_id, channel_id, user_id, reaction_type, is_active))
         self.connection.commit()
-
-    def user_already_reacted(self, message_id, user_id):
-        query = """
-        SELECT id FROM message_reactions 
-        WHERE message_id = %s AND user_id = %s AND expires_at > CURRENT_TIMESTAMP
-        """
-        self.cursor.execute(query, (message_id, user_id))
-        return self.cursor.fetchone() is not None
-
-    def get_expired_reactions(self):
-        query = """
-        SELECT message_id, channel_id FROM message_reactions
-        WHERE expires_at <= CURRENT_TIMESTAMP AND is_active = 1
-        """
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
 
     def deactivate_reaction(self, message_id):
         update_query = """
@@ -193,10 +180,18 @@ class Database:
         query = """
         SELECT reaction_type, COUNT(*) as count
         FROM message_reactions
-        WHERE message_id = %s AND expires_at > CURRENT_TIMESTAMP
+        WHERE message_id = %s
         GROUP BY reaction_type
         """
         self.cursor.execute(query, (message_id,))
         results = self.cursor.fetchall()
         return {row['reaction_type']: row['count'] for row in results}
+    
+    def user_already_reacted(self, message_id, user_id):
+        query = """
+        SELECT id FROM message_reactions 
+        WHERE message_id = %s AND user_id = %s
+        """
+        self.cursor.execute(query, (message_id, user_id))
+        return self.cursor.fetchone() is not None
 
