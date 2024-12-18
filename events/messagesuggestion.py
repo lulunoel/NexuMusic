@@ -1,7 +1,10 @@
 from discord.ext import commands, tasks
+from discord.ui import View, Button
 import discord
 from database import Database
 import os
+import datetime
+import pytz
 
 db = Database(
     host=os.getenv("HOST"),
@@ -14,11 +17,7 @@ db = Database(
 class MessageSuggestion(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.check_expired_reactions.start()
-
-    def cog_unload(self):
-        self.check_expired_reactions.cancel()
-
+        
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.guild is None:
@@ -64,6 +63,19 @@ class MessageSuggestion(commands.Cog):
                 default_color = discord.Color.purple()
                 color = default_color
 
+                current_time = datetime.datetime.now(pytz.UTC)
+
+                embed_timestamp = interaction.message.embeds[0].timestamp
+                time_diff = current_time - embed_timestamp
+
+                if time_diff.total_seconds() > 14400:
+                    await interaction.response.send_message("*La suggestion est terminée ! Les Nexuriens ont fait leur choix !*", ephemeral=True)
+                    for component in interaction.message.components:
+                        for button in component.children:
+                            button.disabled = True
+                    await interaction.message.edit(view=None)
+                    return
+
                 reaction_counts = db.count_reactions(message_id)
                 oui_count = reaction_counts.get("oui", 0)
                 non_count = reaction_counts.get("non", 0)
@@ -73,7 +85,7 @@ class MessageSuggestion(commands.Cog):
                 reaction_type = None
 
                 if interaction.data['custom_id'] in ["oui_button_force", "non_button_force"]:
-                    if interaction.user.guild_permissions.administrator:
+                    if interaction.user.guild_permissions.manage_threads:
                         forced_action = "approuvée" if interaction.data['custom_id'] == "oui_button_force" else "rejetée"
                         color = discord.Color.green() if forced_action == "approuvée" else discord.Color.red()
                         update_text = f"\n\nLa suggestion a été définitivement {forced_action} par {interaction.user.display_name}."
@@ -112,36 +124,6 @@ class MessageSuggestion(commands.Cog):
                     await interaction.response.send_message(f"Vous avez réagi {reaction_type} pour la suggestion! **( +4 Points )**", ephemeral=True)
                 else:
                     await interaction.response.send_message("Action réalisée avec succès.", ephemeral=True)
-                
-    @tasks.loop(minutes=30)
-    async def check_expired_reactions(self):
-        expired_messages = db.get_expired_reactions()
-        for msg in expired_messages:
-            channel = self.bot.get_channel(msg['channel_id'])
-            if channel:
-                try:
-                    message = await channel.fetch_message(msg['message_id'])
-                    reaction_counts = db.count_reactions(msg['message_id'])
-                    oui_count = reaction_counts.get("oui", 0)
-                    non_count = reaction_counts.get("non", 0)
-
-                    if oui_count > non_count:
-                        color = discord.Color.green()
-                    elif non_count > oui_count:
-                        color = discord.Color.red()
-                    else:
-                        color = discord.Color.orange()
-
-                    embed = message.embeds[0]
-                    embed.color = color
-                    embed.description += f"\n\n Oui: {oui_count} \n Non: {non_count} \n\n *La suggestion est terminée ! Les Nexuriens ont fait leur choix !*"
-                    for component in message.components:
-                        for button in component.children:
-                            button.disabled = True
-
-                    await message.edit(embed=embed, view=message.components)
-                except discord.NotFound:
-                    continue
 
 async def setup(bot):
     await bot.add_cog(MessageSuggestion(bot))
