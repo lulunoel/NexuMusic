@@ -5,3 +5,4 @@ python-dotenv
 pymysql
 colorlog
 rich
+pytz
