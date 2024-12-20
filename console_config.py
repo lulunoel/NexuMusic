@@ -9,6 +9,8 @@ def setup_console(name):
     logging.getLogger('discord.http').setLevel(logging.ERROR)
     logging.getLogger('discord.state').setLevel(logging.ERROR)
     logging.getLogger('discord.webhook.async_').setLevel(logging.ERROR)
+    logging.getLogger('discord.voice_state').setLevel(logging.ERROR)
+    logging.getLogger('discord.player').setLevel(logging.ERROR)
 
     console_handler = colorlog.StreamHandler()
     console_handler.setFormatter(colorlog.ColoredFormatter(
