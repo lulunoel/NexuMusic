@@ -96,13 +96,20 @@ NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctio
 ## 📜 Commandes
 
 ### 🎶 Musique
-| Commande                | Description                                             |
-|-------------------------|---------------------------------------------------------|
-| `!radio [radio_name]`   | Affiche la liste des radios ou joue une radio.          |
-| `!addradio <name> <url>`| Ajoute une radio personnalisée pour ce serveur.         |
-| `!removeradio <name>`   | Retire une radio personnalisée pour ce serveur.         |
-| `!stop`                 | Arrête la lecture et vide la file d'attente.            |
-| `!volume <0.1-2.0>`     | Règle le volume de la musique.                          |
+| Commande                | Description                                                         |
+|-------------------------|---------------------------------------------------------------------|
+| `!radio [radio_name]`   | Affiche la liste des radios ou joue une radio.                      |
+| `!addradio <name> <url>`| Ajoute une radio personnalisée pour ce serveur.                     |
+| `!removeradio <name>`   | Retire une radio personnalisée pour ce serveur.                     |
+| `!stop`                 | Arrête la lecture et vide la file d'attente.                        |
+| `!volume <0.1-2.0>`     | Règle le volume de la musique de la radio.                          |
+| `!pause`                | Met en pause la lecture en cours.                                   |
+| `!play <url>`           | Joue une musique depuis une URL YouTube ou Spotify.                 |
+| `!playlist <url>`       | Affiche les vidéos d'une playlist YouTube avec option Play All.     |
+| `!queue`                | Affiche la file d'attente des musiques.                             |
+| `!resume`               | Reprend la lecture mise en pause.                                   |
+| `!skip`                 | Passe à la prochaine musique dans la file d'attente.                |
+| `!skipto <index>`       | Saute à une chanson spécifique dans la file d'attente.              |
 
 ### 📨 Invitations
 | Commande              | Description                                                       |
@@ -125,13 +132,17 @@ NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctio
 
 
 ### 🖥️ Console
-| Commande            | Description                                                       |
-|---------------------|-------------------------------------------------------------------|
-| `stop`              | Arrête le bot.                                                    |
-| `list_guilds`       | Liste les serveurs où le bot est présent.                         |
-| `list_members <id>` | Liste les membres d'un serveur spécifique.                        |
-| `send_message <id>` | Envoie un message dans un canal spécifique.                       |
-| `reload_cog <name>` | Recharge un module (Cog) spécifique.                              |
+| Commande                              | Description                                                       |
+|---------------------------------------|-------------------------------------------------------------------|
+| `stop`                                | Arrête le bot.                                                    |
+| `list_guilds`                         | Liste les serveurs où le bot est présent.                         |
+| `list_members <id>`                   | Liste les membres d'un serveur spécifique.                        |
+| `send_message <id>`                   | Envoie un message dans un canal spécifique.                       |
+| `list_channels <guild_id>`            | Affiche la liste des canaux d'un serveur spécifique.              |
+| `send_message <channel_id> <message>` | Envoie un message dans un canal spécifique.                       |
+| `reload_cog <name>`                   | Recharge un module (Cog) spécifique.                              |
+| `leave_guild <guild_id>`              | Fait quitter un serveur au bot.                                   |
+| `create_invite <guild_id>`            | Crée une invitation pour un serveur spécifique.                   |
 
 ## 🖼️ Exemple d'Interface Console
 
