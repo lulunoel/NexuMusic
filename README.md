@@ -63,6 +63,8 @@ NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctio
    PASSWORD=votre_mot_de_passe
    DATABASE=nexumusic
    PORT=3306
+   SECRET=client_secret spotify
+   CLIENT=client_id spotify
    ```
 
 4. Configurez la base de données MySQL :
