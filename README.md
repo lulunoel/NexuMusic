@@ -17,8 +17,10 @@ NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctio
 
 - **🎶 Commandes musicales :**
   - Lecture de piste radio enregistré une personnel.
+  - Gestion de la music : `!play`, `!pause`, `!resume`.
   - Gestion de la radio : `!stop`, `!addradio`, `!removeradio`.
-  - Commande `!volume` pour régler le volume de la musique.
+  - Commande `!volume` pour régler le volume de la radio.
+  - Commande `!queue` pour voir le liste d'atente.
 - **📨 Gestion des invitations :**
   - Suivi des invitations créées et utilisées.
   - Commande pour voir qui a invité un utilisateur : `!who_invited`.
