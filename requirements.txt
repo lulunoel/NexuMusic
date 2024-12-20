@@ -6,3 +6,4 @@ pymysql
 colorlog
 rich
 pytz
+spotipy
