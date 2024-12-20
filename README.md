@@ -175,5 +175,8 @@ Ce projet est sous licence [MIT](LICENSE).
 
 - [discord.py](https://discordpy.readthedocs.io/) pour la gestion des interactions Discord.
 - [rich](https://github.com/Textualize/rich) pour les améliorations de l'affichage en console.
+- [Spotify developer](https://developer.spotify.com) pour la création de leur api.
+- [Sptipy](https://spotipy.readthedocs.io) pour la gestion de l'api spotify.
+- [Yt-Dlp](https://github.com/yt-dlp/yt-dlp) pour la gestion des url youtube.
 
 ---
