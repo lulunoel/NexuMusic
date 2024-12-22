@@ -5,16 +5,41 @@ logger = logging.getLogger('database')
 
 class Database:
     def __init__(self, host, user, password, database, port):
-        self.connection = pymysql.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database,
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor,
-            port=int(port)
-        )
-        self.cursor = self.connection.cursor()
+        self.connection = None
+        self.cursor = None
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
+        self.port = port
+        self.connect()
+
+    def connect(self):
+        attempts = 0
+        while attempts < 5:
+            try:
+                self.connection = pymysql.connect(
+                    host=self.host,
+                    user=self.user,
+                    password=self.password,
+                    database=self.database,
+                    charset='utf8mb4',
+                    cursorclass=pymysql.cursors.DictCursor,
+                    port=int(self.port)
+                )
+                self.cursor = self.connection.cursor()
+                break
+            except pymysql.MySQLError as e:
+                print(f"Attempt {attempts + 1}: Could not connect to MySQL server. Error: {e}")
+                attempts += 1
+                time.sleep(5)
+        if self.connection is None:
+            raise Exception("Failed to connect to the database after several attempts")
+
+    def reconnect(self):
+        """Reconnects to the database."""
+        self.connection.close()
+        self.connect()
 
     def setup_database(self):
         """Crée les tables nécessaires si elles n'existent pas."""
