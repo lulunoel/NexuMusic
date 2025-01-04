@@ -78,6 +78,8 @@ class InviteManager(commands.Cog):
                     value=f"{inviter.mention} (Code : `{used_invite.code}`)",
                     inline=False,
                 )
+                self.db.add_points(str(member.id), str(member.guild.id), 0)
+                self.db.add_points(str(inviter.id), str(member.guild.id), 100)
             else:
                 embed.add_field(
                     name="Information",

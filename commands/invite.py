@@ -62,7 +62,6 @@ class Invite(commands.Cog):
         user_id = member.id
 
         try:
-            # Requête pour trouver l'invitation utilisée et son créateur
             query = """
             SELECT i.inviter_id, COUNT(iu.user_id) AS invite_count
             FROM invite_uses iu
@@ -120,17 +119,7 @@ class Invite(commands.Cog):
         inviter_id = member.id
 
         try:
-            # Requête pour compter les utilisateurs invités par cette personne
-            query = """
-            SELECT COUNT(iu.user_id) AS invite_count
-            FROM invite_uses iu
-            JOIN invites i ON iu.invite_code = i.invite_code
-            WHERE i.inviter_id = %s AND i.guild_id = %s;
-            """
-            self.db.cursor.execute(query, (inviter_id, guild_id))
-            result = self.db.cursor.fetchone()
-
-            invite_count = result["invite_count"] if result and result["invite_count"] > 0 else 0
+            invite_count = max(self.db.get_invite_count(member.id, ctx.guild.id), 0)
 
             embed = discord.Embed(
                 title="📊 Invitations Compte",

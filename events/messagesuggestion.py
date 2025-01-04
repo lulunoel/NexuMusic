@@ -122,8 +122,10 @@ class MessageSuggestion(commands.Cog):
 
                 if reaction_type:
                     await interaction.response.send_message(f"Vous avez réagi {reaction_type} pour la suggestion! **( +4 Points )**", ephemeral=True)
+                    db.add_points(str(inviter.id), str(member.guild.id), 4)
                 else:
                     await interaction.response.send_message("Action réalisée avec succès.", ephemeral=True)
+
 
 async def setup(bot):
     await bot.add_cog(MessageSuggestion(bot))

@@ -35,6 +35,8 @@ async def load_extensions(bot):
         db.setup_radio_database()
         db.setup_invites_database()
         db.setup_reactions_database()
+        db.setup_economy_database()
+        db.setup_daily_rewards_database()
         logger.info("La base de données est configurée.")
         exclude_files = ['__init__.py', 'help.py']
 

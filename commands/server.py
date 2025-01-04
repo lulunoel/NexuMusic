@@ -31,7 +31,7 @@ class Server(commands.Cog):
         embed.set_footer(text=f"ID du serveur : {guild.id}")
         embed.add_field(name="Niveau de boost", value=f"{guild.premium_tier}/3")
         embed.add_field(name="Nombre de boost", value=guild.premium_subscription_count)
-        rules_channel = guild.rules_channel  # Correction: Utiliser guild pas server
+        rules_channel = guild.rules_channel
         if rules_channel:
             embed.add_field(name="Channel règlement", value=f"<#{rules_channel.id}>", inline=False)
         else:
