@@ -17,7 +17,7 @@ class SetupCommands(commands.Cog):
     async def refresh_settings(self):
         """Rafraîchit la configuration en mémoire pour tous les serveurs."""
         try:
-            all_settings = self.db.get_all_server_settings()  # Suppose que cette méthode récupère tous les paramètres de tous les serveurs
+            all_settings = self.db.get_all_server_settings()
             self.settings = {setting['server_id']: setting for setting in all_settings}
         except Exception as e:
             print(f"Erreur lors de la récupération des paramètres: {e}")
@@ -25,89 +25,47 @@ class SetupCommands(commands.Cog):
     @commands.command(name="setlogchannel", help="Définit ou met à jour le canal de logs pour le serveur.")
     @commands.has_permissions(administrator=True)
     async def set_log_channel(self, ctx, channel: discord.TextChannel):
-        """Met à jour ou définit le canal de logs pour le serveur dans la base de données."""
         server_id = ctx.guild.id
-        server_name = ctx.guild.name
-        channel_id = channel.id  
+        log_channel_id = channel.id
         try:
-            with self.db.connection.cursor() as cursor:
-                update_query = """
-                INSERT INTO server_settings (server_id, server_name, server_log_id)
-                VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE server_log_id = %s
-                """
-                cursor.execute(update_query, (server_id, server_name, channel_id, channel_id))
-                self.db.connection.commit()
-            await ctx.send(f"Le canal de logs a été défini sur {channel.mention}.")
-            await self.refresh_settings()
+            self.db.set_log_channel(server_id, log_channel_id)
+            await ctx.send(f"Le canal de log a été mis à jour avec succès pour le canal: {channel.mention}")
         except Exception as e:
-            await ctx.send(f"Erreur lors de la mise à jour de la base de données: {e}")
-            self.db.connection.rollback()
-            
+            await ctx.send(f"Une erreur est survenue lors de la mise à jour du canal de log: {e}")
+
     @commands.command(name="setwelcomechannel", help="Définit ou met à jour le canal de bienvenue pour le serveur.")
     @commands.has_permissions(administrator=True)
     async def set_welcome_channel(self, ctx, channel: discord.TextChannel):
-        """Met à jour ou définit le canal de bienvenue pour le serveur dans la base de données."""
         server_id = ctx.guild.id
-        server_name = ctx.guild.name
-        channel_id = channel.id 
-
+        welcome_channel_id = channel.id
         try:
-            with self.db.connection.cursor() as cursor:
-                update_query = """
-                INSERT INTO server_settings (server_id, server_name, server_welcome_id)
-                VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE server_welcome_id = %s
-                """
-                cursor.execute(update_query, (server_id, server_name, channel_id, channel_id))
-                self.db.connection.commit()
-            await ctx.send(f"Le canal de bienvenue a été défini sur {channel.mention}.")
-            await self.refresh_settings()
+            self.db.set_welcome_channel(server_id, welcome_channel_id)
+            await ctx.send(f"Le canal de bienvenue a été mis à jour avec succès pour le canal: {channel.mention}")
         except Exception as e:
-            await ctx.send(f"Erreur lors de la mise à jour de la base de données: {e}")
-            self.db.connection.rollback()
-            
-    @commands.command(name="setcountchannel", help="Définit ou met à jour le canal de conteur pour le serveur.")
+            await ctx.send(f"Une erreur est survenue lors de la mise à jour du canal de bienvenue: {e}")
+
+    @commands.command(name="setcountchannel", help="Définit ou met à jour le canal de compteur pour le serveur.")
     @commands.has_permissions(administrator=True)
     async def set_count_channel(self, ctx, channel: discord.TextChannel):
-        """Met à jour ou définit le canal de conteur pour le serveur dans la base de données."""
         server_id = ctx.guild.id
-        server_name = ctx.guild.name
-        channel_id = channel.id 
-
+        count_channel_id = channel.id
         try:
-            with self.db.connection.cursor() as cursor:
-                update_query = """
-                INSERT INTO server_settings (server_id, server_name, server_count_id)
-                VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE server_count_id = %s
-                """
-                cursor.execute(update_query, (server_id, server_name, channel_id, channel_id))
-                self.db.connection.commit()
-            await ctx.send(f"Le canal de conteur a été défini sur {channel.mention}.")
-            await self.refresh_settings()
+            self.db.set_count_channel(server_id, count_channel_id)
+            await ctx.send(f"Le canal de compteur a été mis à jour avec succès pour le canal: {channel.mention}")
         except Exception as e:
-            await ctx.send(f"Erreur lors de la mise à jour de la base de données: {e}")
-            self.db.connection.rollback()
-            
-    @commands.command(name="setsuggestionchannel", help="Définit ou met à jour le canal de suggestion pour le serveur.")
+            await ctx.send(f"Une erreur est survenue lors de la mise à jour du canal de compteur: {e}")
+
+    @commands.command(name="setsuggestionchannel", help="Définit ou met à jour le canal de suggestions pour le serveur.")
     @commands.has_permissions(administrator=True)
-    async def set_count_channel(self, ctx, channel: discord.TextChannel):
-        """Met à jour ou définit le canal de suggestion pour le serveur dans la base de données."""
+    async def set_suggestion_channel(self, ctx, channel: discord.TextChannel):
         server_id = ctx.guild.id
-        server_name = ctx.guild.name
-        channel_id = channel.id 
-
+        suggestion_channel_id = channel.id
         try:
-            with self.db.connection.cursor() as cursor:
-                update_query = """
-                INSERT INTO server_settings (server_id, server_name, server_suggestion_id)
-                VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE server_suggestion_id = %s
-                """
-                cursor.execute(update_query, (server_id, server_name, channel_id, channel_id))
-                self.db.connection.commit()
-            await ctx.send(f"Le canal de suggestion a été défini sur {channel.mention}.")
-            await self.refresh_settings()
+            self.db.set_suggestion_channel(server_id, suggestion_channel_id)
+            await ctx.send(f"Le canal de suggestions a été mis à jour avec succès pour le canal: {channel.mention}")
         except Exception as e:
-            await ctx.send(f"Erreur lors de la mise à jour de la base de données: {e}")
-            self.db.connection.rollback()
+            await ctx.send(f"Une erreur est survenue lors de la mise à jour du canal de suggestions: {e}")
+
             
 async def setup(bot):
     await bot.add_cog(SetupCommands(bot))
