@@ -293,3 +293,39 @@ class Database:
                 """, (user_id, guild_id))
                 result = cursor.fetchone()
                 return result['invite_count'] if result else 0
+            
+    def set_log_channel(self, server_id, server_log_id):
+        try:
+            with self.connect() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute("UPDATE server_settings SET server_log_id = %s WHERE server_id = %s", (server_log_id, server_id))
+                    connection.commit()
+        except Exception as e:
+            logger.error(f"Erreur lors de la mise à jour du canal de log pour le serveur {server_id}: {e}")
+            
+    def set_welcome_channel(self, server_id, server_welcome_id):
+        try:
+            with self.connect() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute("UPDATE server_settings SET server_welcome_id = %s WHERE server_id = %s", (server_welcome_id, server_id))
+                    connection.commit()
+        except Exception as e:
+            logger.error(f"Erreur lors de la mise à jour du canal de log pour le serveur {server_id}: {e}")
+            
+    def set_count_channel(self, server_id, server_count_id):
+        try:
+            with self.connect() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute("UPDATE server_settings SET server_count_id = %s WHERE server_id = %s", (server_count_id, server_id))
+                    connection.commit()
+        except Exception as e:
+            logger.error(f"Erreur lors de la mise à jour du canal de log pour le serveur {server_id}: {e}")
+            
+    def set_suggestion_channel(self, server_id, server_suggestion_id):
+        try:
+            with self.connect() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute("UPDATE server_settings SET server_suggestion_id = %s WHERE server_id = %s", (server_suggestion_id, server_id))
+                    connection.commit()
+        except Exception as e:
+            logger.error(f"Erreur lors de la mise à jour du canal de log pour le serveur {server_id}: {e}")
