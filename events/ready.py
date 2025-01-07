@@ -24,9 +24,30 @@ class ReadyHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         logger.info(f"Bot connecté en tant que {self.bot.user}")
+        for guild in self.bot.guilds:
+            settings = db.get_server_settings(guild.id)
+            if settings:
+                logger.info(f"Paramètres déjà existants pour le serveur {guild.name}")
+            else:
+                logger.info(f"Ajout de nouveaux paramètres par défaut pour le serveur {guild.name}")
+                db.upsert_server_settings(guild.id, guild.name, 1, "")
         await self.resume_radios()
         await self.update_status()
+        
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        settings = db.get_server_settings(guild.id)
+        if not settings:
+            logger.info(f"Ajout de la nouvelle guilde : {guild.name} (ID: {guild.id}) à la base de données.")
+            
+            db.upsert_server_settings(guild.id, guild.name, 1, "")
+        else:
+            logger.info(f"La guilde {guild.name} (ID: {guild.id}) existe déjà dans la base de données.")
 
+        general = find(lambda x: x.name == 'general',  guild.text_channels)
+        if general and general.permissions_for(guild.me).send_messages:
+            await general.send('Bonjour! Je suis votre bot. Voici quelques commandes pour démarrer...')
+            
     @tasks.loop(minutes=5)
     async def update_status(self):
         status_options = [
