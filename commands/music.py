@@ -456,6 +456,10 @@ class Music(commands.Cog):
     async def stop(self, ctx):
         vc = ctx.voice_client
         guild_id = ctx.guild.id
+        guild_name = ctx.guild.name
+        settings = self.db.get_server_settings(guild_id)
+        if not settings:
+            settings = {"volume": 1.0, "last_radio": None}
         if vc:
             queue_length = len(self.queues.get(guild_id, []))
             track_info = self.current_track.get(guild_id, {})
@@ -463,6 +467,7 @@ class Music(commands.Cog):
             await vc.disconnect()
             self.queues[guild_id] = []
             self.update_current_track(guild_id, None)
+            self.db.upsert_server_settings(guild_id, guild_name, settings["volume"], "")
             embed = discord.Embed(title="Lecture arrêtée", description="La lecture et la file d'attente ont été vidées.", color=discord.Color.red())
             embed.add_field(name="Dernière musique jouée", value=track_info.get('title', 'Aucune musique'), inline=False)
             embed.add_field(name="Musiques retirées de la file d'attente", value=str(queue_length), inline=False)
