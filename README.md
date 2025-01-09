@@ -98,20 +98,20 @@ NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctio
 ## 📜 Commandes
 
 ### 🎶 Musique
-| Commande                | Description                                                         |
-|-------------------------|---------------------------------------------------------------------|
-| `!radio [radio_name]`   | Affiche la liste des radios ou joue une radio.                      |
-| `!addradio <name> <url>`| Ajoute une radio personnalisée pour ce serveur.                     |
-| `!removeradio <name>`   | Retire une radio personnalisée pour ce serveur.                     |
-| `!stop`                 | Arrête la lecture et vide la file d'attente.                        |
-| `!volume <0.1-2.0>`     | Règle le volume de la musique de la radio.                          |
-| `!pause`                | Met en pause la lecture en cours.                                   |
-| `!play <url>`           | Joue une musique depuis une URL YouTube ou Spotify.                 |
-| `!playlist <url>`       | Affiche les vidéos d'une playlist YouTube avec option Play All.     |
-| `!queue`                | Affiche la file d'attente des musiques.                             |
-| `!resume`               | Reprend la lecture mise en pause.                                   |
-| `!skip`                 | Passe à la prochaine musique dans la file d'attente.                |
-| `!skipto <index>`       | Saute à une chanson spécifique dans la file d'attente.              |
+| Commande                | Description                                                                   |
+|-------------------------|-------------------------------------------------------------------------------|
+| `!radio [radio_name]`   | Affiche la liste des radios ou joue une radio.                                |
+| `!addradio <name> <url>`| Ajoute une radio personnalisée pour ce serveur.                               |
+| `!removeradio <name>`   | Retire une radio personnalisée pour ce serveur.                               |
+| `!stop`                 | Arrête la lecture et vide la file d'attente.                                  |
+| `!volume <0.1-2.0>`     | Règle le volume de la musique de la radio.                                    |
+| `!pause`                | Met en pause la lecture en cours.                                             |
+| `!play <url>`           | Joue une musique depuis une URL YouTube, Spotify ou recherche par titre.      |
+| `!playlist <url>`       | Affiche les vidéos d'une playlist YouTube avec option Play All.               |
+| `!queue`                | Affiche la file d'attente des musiques.                                       |
+| `!resume`               | Reprend la lecture mise en pause.                                             |
+| `!skip`                 | Passe à la prochaine musique dans la file d'attente.                          |
+| `!skipto <index>`       | Saute à une chanson spécifique dans la file d'attente.                        |
 
 ### 📨 Invitations
 | Commande              | Description                                                       |
@@ -121,17 +121,34 @@ NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctio
 | `!invitations`        | Liste toutes les invitations actives sur le serveur.              |
 
 ### ⚙ Setup
-| Commande                      | Description                                                       |
-|-------------------------------|-------------------------------------------------------------------|
-| `!setcountchannel <channel>`  | Définit ou met à jour le canal de conteur pour le serveur.        |
-| `!setlogchannel <channel>`    | Définit ou met à jour le canal de logs pour le serveur.           |
-| `!setwelcomechannel <channel>`| Définit ou met à jour le canal de bienvenue pour le serveur.      |
+| Commande                         | Description                                                         |
+|----------------------------------|---------------------------------------------------------------------|
+| `!setcountchannel <channel>`     | Définit ou met à jour le canal de conteur pour le serveur.          |
+| `!setlogchannel <channel>`       | Définit ou met à jour le canal de logs pour le serveur.             |
+| `!setwelcomechannel <channel>`   | Définit ou met à jour le canal de bienvenue pour le serveur.        |
+| `!setsuggestionchannel <channel>`| Définit ou met à jour le canal de suggestions pour le serveur.      |
 
 ### 💼 Serveur
 | Commande       | Description                                 |
 |----------------|---------------------------------------------|
 | `!serverinfo`  | Affiche les informations du serveur.        |
 
+### 💼 Economy
+| Commande                                      | Description                                                      |
+|-----------------------------------------------|------------------------------------------------------------------|
+| `!point [add|ajout] <member> <amount>`        | Ajoute des points.                                               |
+| `!point [classement|class] [page=1]`          | Affiche le classement du serveur en fonction des points.         |
+| `!point config`                               | Configure les options du système de points.                      |
+| `!point [daily|jour|claim]`                   | Récupérez votre récompense journalière selon votre grade.        |
+| `!point [grade|infograde|helpgrades]`         | Affiche les informations sur les grades.                         |
+| `!point [help|infopoint]`                     | Affiche les informations sur les points.                         |
+| `!point info <member>`                        | Regarde les points de quelqu'un.                                 |
+| `!point [look|regarde]`                       | Regarde tes points.                                              |
+| `![point|points]`                             | Prefix des commandes de points.                                  |
+| `!point [position|poss]`                      | Permet de voir sa position dans le classement.                   |
+| `!point [remove|retrait] <member> <amount>`   | Retire des points.                                               |
+| `!point [reset|clear] <member>`               | Supprime tous les points.                                        |
+| `!point [set|fixer] <member> <amount>`        | Fixe les points d'un membre.                                     |
 
 ### 🖥️ Console
 | Commande                              | Description                                                       |
