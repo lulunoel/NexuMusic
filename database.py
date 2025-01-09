@@ -1,7 +1,8 @@
 import pymysql
-import logging
+from console_config import setup_console  
 
-logger = logging.getLogger('database')
+logger = setup_console('database')
+
 
 class Database:
     def __init__(self, host, user, password, database, port):
@@ -25,7 +26,7 @@ class Database:
         except pymysql.MySQLError as e:
             logger.error(f"Failed to connect to MySQL server: {e}")
             raise Exception(f"Failed to connect to MySQL server: {e}")
-
+            
     def setup_database(self):
         with self.connect() as connection:
             with connection.cursor() as cursor:
@@ -329,3 +330,46 @@ class Database:
                     connection.commit()
         except Exception as e:
             logger.error(f"Erreur lors de la mise à jour du canal de log pour le serveur {server_id}: {e}")
+            
+    def set_invite_table(self, invite_code, inviter_id, guild_id):
+        try:
+            with self.connect() as connection:
+                with connection.cursor() as cursor:
+                    sql = """
+                    INSERT INTO invites (invite_code, inviter_id, guild_id)
+                    VALUES (%s, %s, %s)
+                    ON DUPLICATE KEY UPDATE inviter_id = VALUES(inviter_id)
+                    """
+                    cursor.execute(sql, (invite_code, inviter_id, guild_id))
+                    connection.commit()
+        except Exception as e:
+            logger.error(f"Erreur lors de la mise à jour de l'invitation pour le serveur {guild_id}: {e}")
+            
+        def check_invite_used(self, user_id, invite_code, guild_id):
+            query = """
+            SELECT COUNT(*) as count
+            FROM invite_uses
+            WHERE user_id = %s AND invite_code = %s AND guild_id = %s
+            """
+            self.cursor.execute(query, (user_id, invite_code, guild_id))
+            return self.cursor.fetchone()
+
+        def add_invite_use(self, user_id, invite_code, guild_id):
+            self.cursor.execute(
+                """
+                INSERT INTO invite_uses (user_id, invite_code, guild_id)
+                VALUES (%s, %s, %s)
+                """,
+                (user_id, invite_code, guild_id)
+            )
+            self.connection.commit()
+            
+        def get_invite_info_on_member_leave(self, user_id, guild_id):
+            query = """
+            SELECT iu.invite_code, i.inviter_id 
+            FROM invite_uses iu
+            JOIN invites i ON iu.invite_code = i.invite_code
+            WHERE iu.user_id = %s AND iu.guild_id = %s
+            """
+            self.cursor.execute(query, (user_id, guild_id))
+        return self.cursor.fetchone()
