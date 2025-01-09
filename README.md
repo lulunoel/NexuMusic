@@ -133,22 +133,22 @@ NexuMusic Bot est un bot Discord multifonctionnel conçu pour offrir des fonctio
 |----------------|---------------------------------------------|
 | `!serverinfo`  | Affiche les informations du serveur.        |
 
-### 💼 Economy
-| Commande                                      | Description                                                      |
-|-----------------------------------------------|------------------------------------------------------------------|
-| `!point [add/ajout] <member> <amount>`        | Ajoute des points.                                               |
-| `!point [classement/class] [page=1]`          | Affiche le classement du serveur en fonction des points.         |
-| `!point config`                               | Configure les options du système de points.                      |
-| `!point [daily/jour/claim]`                   | Récupérez votre récompense journalière selon votre grade.        |
-| `!point [grade/infograde/helpgrades]`         | Affiche les informations sur les grades.                         |
-| `!point [help/infopoint]`                     | Affiche les informations sur les points.                         |
-| `!point info <member>`                        | Regarde les points de quelqu'un.                                 |
-| `!point [look/regarde]`                       | Regarde tes points.                                              |
-| `![point/points]`                             | Prefix des commandes de points.                                  |
-| `!point [position/poss]`                      | Permet de voir sa position dans le classement.                   |
-| `!point [remove/retrait] <member> <amount>`   | Retire des points.                                               |
-| `!point [reset/clear] <member>`               | Supprime tous les points.                                        |
-| `!point [set/fixer] <member> <amount>`        | Fixe les points d'un membre.                                     |
+### 💸 Economy
+| Commande                                      | Description                                               |
+|-----------------------------------------------|-----------------------------------------------------------|
+| `!point [add/ajout] <member> <amount>`        | Ajoute des points.                                        |
+| `!point [classement/class] [page=1]`          | Affiche le classement du serveur en fonction des points.  |
+| `!point config`                               | Configure les options du système de points.               |
+| `!point [daily/jour/claim]`                   | Récupérez votre récompense journalière selon votre grade. |
+| `!point [grade/infograde/helpgrades]`         | Affiche les informations sur les grades.                  |
+| `!point [help/infopoint]`                     | Affiche les informations sur les points.                  |
+| `!point info <member>`                        | Regarde les points de quelqu'un.                          |
+| `!point [look/regarde]`                       | Regarde tes points.                                       |
+| `![point/points]`                             | Prefix des commandes de points.                           |
+| `!point [position/poss]`                      | Permet de voir sa position dans le classement.            |
+| `!point [remove/retrait] <member> <amount>`   | Retire des points.                                        |
+| `!point [reset/clear] <member>`               | Supprime tous les points.                                 |
+| `!point [set/fixer] <member> <amount>`        | Fixe les points d'un membre.                              |
 
 ### 🖥️ Console
 | Commande                              | Description                                                       |
