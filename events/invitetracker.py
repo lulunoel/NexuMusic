@@ -3,11 +3,21 @@ from discord.ext import commands
 from database import Database
 import datetime
 import os
+import logging
+from console_config import setup_console
 
+logger = setup_console('invite')
+
+db = Database(
+    host=os.getenv("HOST"),
+    user=os.getenv("UTILISATEUR"),
+    password=os.getenv("PASSWORD"),
+    database=os.getenv("DATABASE"),
+    port=int(os.getenv("PORT"))
+)
 class InviteManager(commands.Cog):
-    def __init__(self, bot, db: Database):
+    def __init__(self, bot):
         self.bot = bot
-        self.db = db
         self.invites_cache = {}
 
     @commands.Cog.listener()
@@ -20,7 +30,7 @@ class InviteManager(commands.Cog):
     async def on_invite_create(self, invite: discord.Invite):
         """Ajoute une nouvelle invitation dans la base de données et met à jour le cache des invitations."""
         try:
-            self.db.set_invite_table(invite.code, invite.inviter.id, invite.guild.id)
+            db.set_invite_table(invite.code, invite.inviter.id, invite.guild.id)
         except Exception as e:
             logger.error(f"Failed to insert/update invite in the database: {e}")
 
@@ -54,10 +64,10 @@ class InviteManager(commands.Cog):
         embed.add_field(name="Membre", value=member.mention, inline=False)
 
         if used_invite:
-            result = self.db.check_invite_used(member.id, used_invite.code, member.guild.id)
+            result = db.check_invite_used(member.id, used_invite.code, member.guild.id)
 
             if result and result["count"] == 0:
-                self.db.add_invite_use(member.id, used_invite.code, member.guild.id)
+                db.add_invite_use(member.id, used_invite.code, member.guild.id)
 
                 inviter = await member.guild.fetch_member(used_invite.inviter.id)
                 embed.add_field(
@@ -65,8 +75,8 @@ class InviteManager(commands.Cog):
                     value=f"{inviter.mention} (Code : `{used_invite.code}`)",
                     inline=False,
                 )
-                self.db.add_points(str(member.id), str(member.guild.id), 0)
-                self.db.add_points(str(inviter.id), str(member.guild.id), 100)
+                db.add_points(str(member.id), str(member.guild.id), 0)
+                db.add_points(str(inviter.id), str(member.guild.id), 100)
             else:
                 embed.add_field(
                     name="Information",
@@ -90,7 +100,7 @@ class InviteManager(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
         """Handles when a member leaves the guild."""
-        result = self.db.get_invite_info_on_member_leave(member.id, member.guild.id)
+        result = db.get_invite_info_on_member_leave(member.id, member.guild.id)
 
         embed = discord.Embed(
             title="👋 Départ d'un membre",
@@ -127,11 +137,4 @@ class InviteManager(commands.Cog):
         await member.guild.system_channel.send(embed=embed)
 
 async def setup(bot):
-    db = Database(
-        host=os.getenv("HOST"),
-        user=os.getenv("UTILISATEUR"),
-        password=os.getenv("PASSWORD"),
-        database=os.getenv("DATABASE"),
-        port=os.getenv("PORT")
-    )
-    await bot.add_cog(InviteManager(bot, db))
+    await bot.add_cog(InviteManager(bot))
