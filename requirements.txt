@@ -7,3 +7,4 @@ colorlog
 rich
 pytz
 spotipy
+yt_dlp
