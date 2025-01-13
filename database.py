@@ -345,31 +345,36 @@ class Database:
         except Exception as e:
             logger.error(f"Erreur lors de la mise à jour de l'invitation pour le serveur {guild_id}: {e}")
             
-        def check_invite_used(self, user_id, invite_code, guild_id):
-            query = """
-            SELECT COUNT(*) as count
-            FROM invite_uses
-            WHERE user_id = %s AND invite_code = %s AND guild_id = %s
-            """
-            self.cursor.execute(query, (user_id, invite_code, guild_id))
-            return self.cursor.fetchone()
+    def check_invite_used(self, user_id, invite_code, guild_id):
+        query = """
+        SELECT COUNT(*) AS count
+        FROM invite_uses
+        WHERE user_id = %s AND invite_code = %s AND guild_id = %s
+        """
+        with self.connect() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (user_id, invite_code, guild_id))
+                return cursor.fetchone()
 
-        def add_invite_use(self, user_id, invite_code, guild_id):
-            self.cursor.execute(
-                """
-                INSERT INTO invite_uses (user_id, invite_code, guild_id)
-                VALUES (%s, %s, %s)
-                """,
-                (user_id, invite_code, guild_id)
-            )
-            self.connection.commit()
-            
-        def get_invite_info_on_member_leave(self, user_id, guild_id):
-            query = """
-            SELECT iu.invite_code, i.inviter_id 
-            FROM invite_uses iu
-            JOIN invites i ON iu.invite_code = i.invite_code
-            WHERE iu.user_id = %s AND iu.guild_id = %s
-            """
-            self.cursor.execute(query, (user_id, guild_id))
-        return self.cursor.fetchone()
+    def add_invite_use(self, user_id, invite_code, guild_id):
+        query = """
+        INSERT INTO invite_uses (user_id, invite_code, guild_id)
+        VALUES (%s, %s, %s)
+        """
+        with self.connect() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (user_id, invite_code, guild_id))
+                connection.commit()
+
+    def get_invite_info_on_member_leave(self, user_id, guild_id):
+        query = """
+        SELECT iu.invite_code, i.inviter_id
+        FROM invite_uses iu
+        JOIN invites i ON iu.invite_code = i.invite_code
+        WHERE iu.user_id = %s AND iu.guild_id = %s
+        """
+        with self.connect() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (user_id, guild_id))
+                return cursor.fetchone()
+
