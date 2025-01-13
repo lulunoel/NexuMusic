@@ -5,7 +5,8 @@ from console_config import setup_console
 from database import Database
 import os
 import asyncio
-
+import logging
+from console_config import setup_console
 logger = setup_console('discord')
 db = Database(
     host=os.getenv("HOST"),
@@ -65,7 +66,7 @@ class DiscordLoggerHandler(commands.Cog):
             removed = [role.name for role in before.roles if role not in after.roles]
             added = [role.name for role in after.roles if role not in before.roles]
             logger.info(f'Roles editée pour {after.name}: Ajout: {added}, Retrait: {removed}')
-
+                
     @commands.Cog.listener()
     async def on_guild_role_create(self, role):
         logger.info(f'Role crée: {role.name}')
@@ -80,6 +81,15 @@ class DiscordLoggerHandler(commands.Cog):
             logger.info(f'Role permissions éditée pour {after.name}: de {before.permissions} à {after.permissions}')
         if before.name != after.name:
             logger.info(f'Role nom changée pour {before.name} à {after.name}')
+            
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild, user):
+        logger.info(f"{user} à été banni de {guild.name}")
+        db.remove_points(str(user.id), str(guild.id), 60)
 
+    @commands.Cog.listener()
+    async def on_member_unban(self, guild, user):
+        logger.info(f"{user} à été débanni de {guild.name}")
+        
 async def setup(bot):
     await bot.add_cog(DiscordLoggerHandler(bot))
